@@ -6,7 +6,7 @@
 <form id="form_0" class="form-horizontal" action="@Url.Action("CreateOrUpdate", "Home")" method="post" onsubmit="return false;">
     <div class="card-body">
         <div class="form-group row">
-            <label for="@Html.IdFor(model=> model.Group)" class="col-sm-1 col-form-label">分组名称</label>
+            <label for="@Html.IdFor(model=> model.Group)" class="col-sm-1 col-form-label">机台名称</label>
             <div class="col-sm-5">
                 <input type="text" class="form-control" asp-for="Group" placeholder="必填" required>
             </div>
@@ -16,13 +16,41 @@
             </div>
         </div>
         <div class="form-group row">
-            <label for="@Html.IdFor(model=> model.HttpMethod)" class="col-sm-1 col-form-label">请求方式</label>
+            <label for="@Html.IdFor(model=> model.TransferType)" class="col-sm-1 col-form-label">文件传输方式</label>
             <div class="col-sm-5">
-                <select asp-for="HttpMethod" asp-items="Model.Properties[PropertiesKeys.Key_1]" class="form-control"></select>
+                <select asp-for="TransferType" asp-items="Model.Properties[PropertiesKeys.Key_1]" class="form-control"></select>
             </div>
-            <label for="@Html.IdFor(model=> model.RequestUrl)" class="col-sm-1 col-form-label">请求地址</label>
+            <label for="@Html.IdFor(model=> model.UserName)" class="col-sm-1 col-form-label">用户名</label>
             <div class="col-sm-5">
-                <input type="url" class="form-control" asp-for="RequestUrl" placeholder="必填" required>
+                <input type="text" class="form-control" asp-for="UserName" placeholder="必填" required>
+            </div>
+            <label for="@Html.IdFor(model=> model.Password)" class="col-sm-1 col-form-label">密码</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" asp-for="Password" placeholder="必填" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="@Html.IdFor(model=> model.SourceRootPath)" class="col-sm-1 col-form-label">源文件根路径</label>
+            <div class="col-sm-5">
+                <input type="url" class="form-control" asp-for="SourceRootPath" placeholder="必填" required>
+            </div>
+            <label for="@Html.IdFor(model=> model.SourceFilePattern)" class="col-sm-1 col-form-label">源文件匹配模式</label>
+            <div class="col-sm-5">
+                <input type="url" class="form-control" asp-for="SourceFilePattern" placeholder="必填" required>
+            </div>
+            <label for="@Html.IdFor(model=> model.DestinationFilePattern)" class="col-sm-1 col-form-label">目标文件根路径</label>
+            <div class="col-sm-5">
+                <input type="url" class="form-control" asp-for="DestinationRootPath" placeholder="必填" required>
+            </div>
+            <label for="@Html.IdFor(model=> model.DestinationFilePattern)" class="col-sm-1 col-form-label">目标文件匹配模式</label>
+            <div class="col-sm-5">
+                <input type="url" class="form-control" asp-for="DestinationFilePattern" placeholder="必填" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="@Html.IdFor(model=> model.DeleteOnCopied)" class="col-sm-1 col-form-label">复制后删除</label>
+            <div class="col-sm-5">
+                <input type="checkbox" class="form-control" asp-for="DeleteOnCopied">
             </div>
         </div>
         <div class="form-group row">

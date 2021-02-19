@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Calamus.TaskScheduler.Infrastructure
 {
-    public enum HttpMethodEnum
+    public enum TransferTypeEnum
     {
-        [Description("GET")]
-        Get = 1,
-        [Description("POST")]
-        Post = 2
+        [Description("SharedFolder")]
+        SharedFolder = 1,
+        [Description("FTP")]
+        FTP = 2
     }
 
     public enum TriggerTypeEnum

@@ -8,10 +8,22 @@ namespace Calamus.TaskScheduler.Infrastructure
 {
     public static class JobDataMapExtensions
     {
-        public static int GetHttpMethod(this JobDataMap map)
-            => map.GetInt(DataKeys.HttpMethod);
-        public static string GetRequestUrl(this JobDataMap map)
-            => map.GetString(DataKeys.RequestUrl);
+        public static int GetTransferType(this JobDataMap map)
+            => map.GetInt(DataKeys.TransferType);
+        public static string GetSourceRootPath(this JobDataMap map)
+            => map.GetString(DataKeys.SourceRootPath);
+        public static string GetSourceFilePattern(this JobDataMap map)
+            => map.GetString(DataKeys.SourceFilePattern);
+        public static string GetDestinationRootPath(this JobDataMap map)
+            => map.GetString(DataKeys.DestionationRootPath);
+        public static string GetDestinationFilePattern(this JobDataMap map)
+            => map.GetString(DataKeys.DestionationFilePattern);
+        public static string GetUserName(this JobDataMap map)
+            => map.GetString(DataKeys.UserName);
+        public static string GetPassword(this JobDataMap map)
+            => map.GetString(DataKeys.Password);
+        public static bool GetDeleteOnCopied(this JobDataMap map)
+            => map.GetBoolean(DataKeys.DeleteOnCopied);
         public static int GetTriggerType(this JobDataMap map)
             => map.GetInt(DataKeys.TriggerType);
         public static int GetRepeatCount(this JobDataMap map)

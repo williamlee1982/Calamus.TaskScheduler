@@ -74,7 +74,7 @@ namespace Calamus.TaskScheduler
                     options.UseProperties = false;
                     //options.UseBinarySerializer();  // 二进制序列化
                     options.UseJsonSerializer();    // json序列化
-                    options.UseMySql(ado =>
+                    options.UseOracle(ado =>
                     {
                         ado.ConnectionString = quartzConfiguration["Database"];
                         ado.TablePrefix = quartzConfiguration["TablePrefix"];  // 默认值 QRTZ_

@@ -82,8 +82,8 @@ namespace Calamus.TaskScheduler.Controllers
                     Name = job.Key.Name,
                     Group = job.Key.Group,
                     TriggerState = TriggerState.Complete,
-                    HttpMethod = job.JobDataMap.GetHttpMethod(),
-                    RequestUrl = job.JobDataMap.GetRequestUrl(),
+                    HttpMethod = job.JobDataMap.GetTransferType(),
+                    RequestUrl = job.JobDataMap.GetSourceRootPath(),
                     TriggerType = job.JobDataMap.GetTriggerType(),
                     Interval = job.JobDataMap.GetInterval(),
                     IntervalType = job.JobDataMap.GetIntervalType(),
@@ -129,7 +129,7 @@ namespace Calamus.TaskScheduler.Controllers
             JobCreateOrUpdateRequest model = new JobCreateOrUpdateRequest
             {
                 Group = group,
-                HttpMethod = (int)HttpMethodEnum.Get,
+                TransferType = (int)TransferTypeEnum.SharedFolder,
                 TriggerType = (int)TriggerTypeEnum.Simple,
                 Interval = 60,
                 IsUpdate = false
@@ -144,8 +144,8 @@ namespace Calamus.TaskScheduler.Controllers
                 {
                     Name = job.Key.Name,
                     Group = job.Key.Group,
-                    HttpMethod = job.JobDataMap.GetHttpMethod(),
-                    RequestUrl = job.JobDataMap.GetRequestUrl(),
+                    TransferType = job.JobDataMap.GetTransferType(),
+                    SourceRootPath = job.JobDataMap.GetSourceRootPath(),
                     StartTime = job.JobDataMap.GetStartTime(),
                     EndTime = job.JobDataMap.GetEndTime(),
                     TriggerType = job.JobDataMap.GetTriggerType(),
@@ -159,7 +159,7 @@ namespace Calamus.TaskScheduler.Controllers
                 };
             }
 
-            model.Properties.Add(PropertiesKeys.Key_1, HttpMethodEnum.Get.ToSelectList());
+            model.Properties.Add(PropertiesKeys.Key_1, TransferTypeEnum.SharedFolder.ToSelectList());
             model.Properties.Add(PropertiesKeys.Key_2, TriggerTypeEnum.Simple.ToSelectList());
             model.Properties.Add(PropertiesKeys.Key_3, IntervalTypeEnum.Second.ToSelectList());
 
@@ -184,8 +184,8 @@ namespace Calamus.TaskScheduler.Controllers
 
             /******Data*****/
             JobDataMap dataMap = new JobDataMap();
-            dataMap.Put(DataKeys.HttpMethod, request.HttpMethod);
-            dataMap.Put(DataKeys.RequestUrl, request.RequestUrl);
+            dataMap.Put(DataKeys.TransferType, request.TransferType);
+            dataMap.Put(DataKeys.SourceRootPath, request.SourceRootPath);
             dataMap.Put(DataKeys.TriggerType, request.TriggerType);
             dataMap.Put(DataKeys.RepeatCount, request.RepeatCount);
             dataMap.Put(DataKeys.Interval, request.Interval);

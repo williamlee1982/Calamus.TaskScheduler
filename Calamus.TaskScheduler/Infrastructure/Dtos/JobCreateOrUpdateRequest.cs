@@ -15,13 +15,37 @@ namespace Calamus.TaskScheduler.Infrastructure.Dtos
         /// </summary>
         public string Group { get; set; }
         /// <summary>
-        /// 请求方式
+        /// 文件传输方式
         /// </summary>
-        public int HttpMethod { get; set; }
+        public int TransferType { get; set; }
         /// <summary>
-        /// 任务名称
+        /// 用户名
         /// </summary>
-        public string RequestUrl { get; set; }
+        public string UserName { get; set; }
+        /// <summary>
+        /// 密码
+        /// </summary>
+        public string Password { get; set; }
+        /// <summary>
+        /// 源文件根路径
+        /// </summary>
+        public string SourceRootPath { get; set; }
+        /// <summary>
+        /// 源文件抓取匹配模式(正则表达式)
+        /// </summary>
+        public string SourceFilePattern { get; set; }
+        /// <summary>
+        /// 目标文件根路径
+        /// </summary>
+        public string DestinationRootPath { get; set; }
+        /// <summary>
+        /// 目标文件名匹配模式(正则表达式)
+        /// </summary>
+        public string DestinationFilePattern { get; set; }
+        /// <summary>
+        /// 复制后是否删除
+        /// </summary>
+        public bool DeleteOnCopied { get; set; }
         /// <summary>
         /// 触发类型
         /// </summary>
@@ -70,8 +94,8 @@ namespace Calamus.TaskScheduler.Infrastructure.Dtos
         {
             RuleFor(model => model.Name).NotEmpty();
             RuleFor(model => model.Group).NotEmpty();
-            RuleFor(model => model.HttpMethod).Must(x => HttpMethodEnum.Get.ToValueList().Contains(x));
-            RuleFor(model => model.RequestUrl).Matches(@"^((http|https)://)(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-]*)?$").WithMessage("请输入正确的请求地址");
+            RuleFor(model => model.TransferType).Must(x => TransferTypeEnum.SharedFolder.ToValueList().Contains(x));
+            RuleFor(model => model.SourceRootPath).Matches(@"^((http|https)://)(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-]*)?$").WithMessage("请输入正确的请求地址");
             RuleFor(model => model.StartTime).NotNull();
             RuleFor(model => model.TriggerType).Must(x => TriggerTypeEnum.Simple.ToValueList().Contains(x));
             When(model => model.TriggerType == (int)TriggerTypeEnum.Simple, () =>
@@ -81,7 +105,7 @@ namespace Calamus.TaskScheduler.Infrastructure.Dtos
             });
             When(model => model.TriggerType == (int)TriggerTypeEnum.Cron, () => RuleFor(model => model.Cron)
                                                                                 .NotEmpty()
-                                                                                .Must(x=> CronExpression.IsValidExpression(x)).WithMessage("不正确的Cron表达式"));
+                                                                                .Must(x => CronExpression.IsValidExpression(x)).WithMessage("不正确的Cron表达式"));
             When(model => model.EndTime.HasValue, () => RuleFor(model => model.EndTime).GreaterThan(DateTime.Now).WithMessage("结束时间必须大于当前时间"));
         }
     }

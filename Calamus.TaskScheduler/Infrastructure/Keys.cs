@@ -13,8 +13,14 @@ namespace Calamus.TaskScheduler.Infrastructure
 
     internal sealed class DataKeys
     {
-        public static readonly string HttpMethod = "HttpMethod";
-        public static readonly string RequestUrl = "RequestUrl";
+        public static readonly string TransferType = "TransferType";
+        public static readonly string SourceRootPath = "SourceRootPath";
+        public static readonly string SourceFilePattern = "SourceFilePattern";
+        public static readonly string UserName = "UserName";
+        public static readonly string Password = "Password";
+        public static readonly string DestionationRootPath = "DestionationRootPath";
+        public static readonly string DestionationFilePattern = "DestionationFilePattern";
+        public static readonly string DeleteOnCopied = "DeleteOnCopied";
         public static readonly string TriggerType = "TriggerType";
         public static readonly string RepeatCount = "RepeatCount";
         public static readonly string Interval = "Interval";

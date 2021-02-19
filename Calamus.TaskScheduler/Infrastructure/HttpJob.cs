@@ -18,10 +18,10 @@ namespace Calamus.TaskScheduler.Infrastructure
         }
         public async Task Execute(IJobExecutionContext context)
         {
-            string requestUrl = context.JobDetail.JobDataMap.GetRequestUrl();
-            int httpMethod = context.JobDetail.JobDataMap.GetHttpMethod();
+            string requestUrl = context.JobDetail.JobDataMap.GetSourceRootPath();
+            int httpMethod = context.JobDetail.JobDataMap.GetTransferType();
             string result;
-            if (httpMethod == (int)HttpMethodEnum.Post)
+            if (httpMethod == (int)TransferTypeEnum.FTP)
             {
                 string requestBody = context.JobDetail.JobDataMap.GetRequestBody();
                 HttpResponseMessage response = await _http.PostAsync(requestUrl, new StringContent(requestBody, Encoding.UTF8, "application/json"));

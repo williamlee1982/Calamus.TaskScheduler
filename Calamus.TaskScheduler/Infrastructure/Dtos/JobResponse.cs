@@ -17,7 +17,7 @@ namespace Calamus.TaskScheduler.Infrastructure.Dtos
         {
             get
             {
-                return ((HttpMethodEnum)HttpMethod).ToText();
+                return ((TransferTypeEnum)HttpMethod).ToText();
             }
         }
         public string RequestUrl { get; set; }
