@@ -12,15 +12,15 @@ namespace Calamus.TaskScheduler.Infrastructure.Dtos
         /// <summary>
         /// 请求方式
         /// </summary>
-        public int HttpMethod { get; set; }
-        public string HttpMethodName
+        public int TransferType { get; set; }
+        public string TransferTypeName
         {
             get
             {
-                return ((TransferTypeEnum)HttpMethod).ToText();
+                return ((TransferTypeEnum)TransferType).ToText();
             }
         }
-        public string RequestUrl { get; set; }
+        public string SourceRootPath { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public DateTime? PrevFireTime { get; set; }
@@ -87,7 +87,7 @@ namespace Calamus.TaskScheduler.Infrastructure.Dtos
                 return string.Empty;
             }
         }
-        public string RequestBody { get; set; }
+        public string SourceFilePattern { get; set; }
         public string Description { get; set; }
         /// <summary>
         /// 创建时间

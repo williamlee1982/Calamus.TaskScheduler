@@ -55,7 +55,7 @@ namespace Calamus.TaskScheduler
 
             /***********Quartz.NET*********/
             IConfigurationSection quartzConfiguration = Configuration.GetSection("Quartz"); // Quartz配置节点
-            services.AddTransient<HttpJob>();   // 注册job至容器，必须步骤
+            services.AddTransient<SharedFolderJob>();   // 注册job至容器，必须步骤
             services.AddQuartz(config =>
             {
                 config.UseTimeZoneConverter();

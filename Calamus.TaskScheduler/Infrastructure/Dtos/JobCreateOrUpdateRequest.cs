@@ -95,7 +95,7 @@ namespace Calamus.TaskScheduler.Infrastructure.Dtos
             RuleFor(model => model.Name).NotEmpty();
             RuleFor(model => model.Group).NotEmpty();
             RuleFor(model => model.TransferType).Must(x => TransferTypeEnum.SharedFolder.ToValueList().Contains(x));
-            RuleFor(model => model.SourceRootPath).Matches(@"^((http|https)://)(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-]*)?$").WithMessage("请输入正确的请求地址");
+            //RuleFor(model => model.SourceRootPath).Matches(@"^((http|https)://)(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-]*)?$").WithMessage("请输入正确的请求地址");
             RuleFor(model => model.StartTime).NotNull();
             RuleFor(model => model.TriggerType).Must(x => TriggerTypeEnum.Simple.ToValueList().Contains(x));
             When(model => model.TriggerType == (int)TriggerTypeEnum.Simple, () =>

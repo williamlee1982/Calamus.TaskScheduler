@@ -13,6 +13,7 @@ using Quartz.Impl.Matchers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Calamus.TaskScheduler.Controllers
@@ -72,7 +73,7 @@ namespace Calamus.TaskScheduler.Controllers
             foreach (JobKey key in jobKeys)
             {
                 // 过滤掉邮件通知配置job，NLog日志文件清除Job
-                if (string.Equals(key.Name, EmailJobKeys.NameKey, StringComparison.InvariantCultureIgnoreCase) || string.Equals(key.Name, NLogJobKey.NameKey, StringComparison.InvariantCultureIgnoreCase)) continue; 
+                if (string.Equals(key.Name, EmailJobKeys.NameKey, StringComparison.InvariantCultureIgnoreCase) || string.Equals(key.Name, NLogJobKey.NameKey, StringComparison.InvariantCultureIgnoreCase)) continue;
 
                 IJobDetail job = await _scheduler.GetJobDetail(key);
                 if (job == null) continue;
@@ -82,14 +83,14 @@ namespace Calamus.TaskScheduler.Controllers
                     Name = job.Key.Name,
                     Group = job.Key.Group,
                     TriggerState = TriggerState.Complete,
-                    HttpMethod = job.JobDataMap.GetTransferType(),
-                    RequestUrl = job.JobDataMap.GetSourceRootPath(),
+                    TransferType = job.JobDataMap.GetTransferType(),
+                    SourceRootPath = job.JobDataMap.GetSourceRootPath(),
                     TriggerType = job.JobDataMap.GetTriggerType(),
                     Interval = job.JobDataMap.GetInterval(),
                     IntervalType = job.JobDataMap.GetIntervalType(),
                     RepeatCount = job.JobDataMap.GetRepeatCount(),
                     Cron = job.JobDataMap.GetCron(),
-                    RequestBody = job.JobDataMap.GetRequestBody(),
+                    SourceFilePattern = job.JobDataMap.GetSourceFilePattern(),
                     Description = job.Description,
                     CreateTime = job.JobDataMap.GetCreateTime(),
                     StartTime = job.JobDataMap.GetStartTime(),
@@ -130,10 +131,18 @@ namespace Calamus.TaskScheduler.Controllers
             {
                 Group = group,
                 TransferType = (int)TransferTypeEnum.SharedFolder,
+                UserName = @".\administrator",
+                Password = "12345@163.com",
+                SourceRootPath = @"\\10.48.68.205",
+                SourceFilePattern = @"^(?<fpath>(\\\\)([\s\.\-\w]+\\)*)(?<fname>[\w]+.[\w]+)",
+                DestinationRootPath = @"D:\",
+                DestinationFilePattern = "${fname}",
                 TriggerType = (int)TriggerTypeEnum.Simple,
                 Interval = 60,
+                IntervalType = (int)IntervalTypeEnum.Minute,
                 IsUpdate = false
             };
+
             if (!string.IsNullOrWhiteSpace(group) && !string.IsNullOrWhiteSpace(name))
             {
                 /**********不为空，说明是更新任务**********/
@@ -145,7 +154,13 @@ namespace Calamus.TaskScheduler.Controllers
                     Name = job.Key.Name,
                     Group = job.Key.Group,
                     TransferType = job.JobDataMap.GetTransferType(),
+                    UserName = job.JobDataMap.GetUserName(),
+                    Password = job.JobDataMap.GetPassword(),
                     SourceRootPath = job.JobDataMap.GetSourceRootPath(),
+                    SourceFilePattern = job.JobDataMap.GetSourceFilePattern(),
+                    DestinationRootPath = job.JobDataMap.GetDestinationRootPath(),
+                    DestinationFilePattern = job.JobDataMap.GetDestinationFilePattern(),
+                    DeleteOnCopied = job.JobDataMap.GetDeleteOnCopied(),
                     StartTime = job.JobDataMap.GetStartTime(),
                     EndTime = job.JobDataMap.GetEndTime(),
                     TriggerType = job.JobDataMap.GetTriggerType(),
@@ -165,6 +180,7 @@ namespace Calamus.TaskScheduler.Controllers
 
             return View(model);
         }
+
         [ModelValidatorFilter]
         [HttpPost]
         public async Task CreateOrUpdate(JobCreateOrUpdateRequest request)
@@ -185,7 +201,13 @@ namespace Calamus.TaskScheduler.Controllers
             /******Data*****/
             JobDataMap dataMap = new JobDataMap();
             dataMap.Put(DataKeys.TransferType, request.TransferType);
+            dataMap.Put(DataKeys.UserName, request.UserName);
+            dataMap.Put(DataKeys.Password, request.Password);
             dataMap.Put(DataKeys.SourceRootPath, request.SourceRootPath);
+            dataMap.Put(DataKeys.SourceFilePattern, request.SourceFilePattern);
+            dataMap.Put(DataKeys.DestionationRootPath, request.DestinationRootPath);
+            dataMap.Put(DataKeys.DestionationFilePattern, request.DestinationFilePattern);
+            dataMap.Put(DataKeys.DeleteOnCopied, request.DeleteOnCopied);
             dataMap.Put(DataKeys.TriggerType, request.TriggerType);
             dataMap.Put(DataKeys.RepeatCount, request.RepeatCount);
             dataMap.Put(DataKeys.Interval, request.Interval);
@@ -197,13 +219,17 @@ namespace Calamus.TaskScheduler.Controllers
             dataMap.Put(DataKeys.EndTime, request.EndTime.HasValue ? request.EndTime.Value.ToString() : string.Empty);
 
             /******Job*****/
-            IJobDetail job = JobBuilder.Create<HttpJob>()
-                .StoreDurably(true)     // 是否持久化， 无关联触发器时是否移除，false：移除
-                .RequestRecovery()  // 重启后是否恢复任务
-                .WithDescription(request.Description ?? string.Empty)
-                .WithIdentity(request.Name, request.Group)
-                .UsingJobData(dataMap)
-                .Build();
+            IJobDetail job = null;
+            if (request.TransferType == (int)TransferTypeEnum.SharedFolder)
+            {
+                job = JobBuilder.Create<SharedFolderJob>()
+                   .StoreDurably(true)      // 是否持久化， 无关联触发器时是否移除，false：移除
+                   .RequestRecovery()       // 重启后是否恢复任务
+                   .WithDescription(request.Description ?? string.Empty)
+                   .WithIdentity(request.Name, request.Group)
+                   .UsingJobData(dataMap)
+                   .Build();
+            }
 
             /******Trigger*****/
             TriggerBuilder builder = TriggerBuilder.Create()
@@ -266,16 +292,19 @@ namespace Calamus.TaskScheduler.Controllers
             await _scheduler.DeleteJob(new JobKey(name, group));
             FlushCache();
         }
+
         [HttpPost]
         public async Task Pause(string name, string group)
         {
             await _scheduler.PauseJob(new JobKey(name, group));
         }
+
         [HttpPost]
         public async Task Resume(string name, string group)
         {
             await _scheduler.ResumeJob(new JobKey(name, group));
         }
+
         [HttpPost]
         public async Task Trigger(string name, string group)
         {
@@ -421,6 +450,50 @@ namespace Calamus.TaskScheduler.Controllers
         public async Task Email(string to, string subject, string body)
         {
             await _fluentEmail.To(to).Subject(subject).Body(body, true).SendAsync();
+        }
+
+        /// <summary>
+        /// 正则表达式测试
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> RegEx()
+        {
+            var model = new RegExRequest();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ModelValidatorFilter]
+        public async Task<RegExRequest> RegEx(RegExRequest request)
+        {
+            await Task.Run(() =>
+            {
+                var regex = new Regex(request.RegEx);
+
+                if (regex.IsMatch(request.InputString))
+                {
+                    var match = regex.Match(request.InputString);
+                    request.Match = match.Value;
+
+                    if (!string.IsNullOrEmpty(request.Replace))
+                    {
+                        request.Result = regex.Replace(request.InputString, request.Replace);
+                    }
+                    else
+                    {
+                        request.Result = "";
+                    }
+                }
+                else
+                {
+                    request.Match = "";
+                    request.Result = "";
+                }
+            });
+
+            return request;
         }
 
         /// <summary>

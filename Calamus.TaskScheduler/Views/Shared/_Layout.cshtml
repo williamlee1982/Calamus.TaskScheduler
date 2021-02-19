@@ -79,7 +79,7 @@
                 <nav class="mt-0">
                     <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-flat nav-compact" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
-                        with font-awesome or any other icon font library -->
+    with font-awesome or any other icon font library -->
                         <li class="nav-header" id="menu-header"><i class="nav-icon fas fa-desktop"></i><span>控制面板</span></li>
                         <li class="nav-item">
                             <a href="@Url.Action("Index", "Home")" class="nav-link">
@@ -102,6 +102,14 @@
                                 <i class="nav-icon fas fa-server"></i>
                                 <p>
                                     服务状态
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("RegEx", "Home")" class="nav-link">
+                                <i class="nav-icon fas fa-server"></i>
+                                <p>
+                                    正则测试
                                 </p>
                             </a>
                         </li>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using NLog;
 using Quartz;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,8 @@ namespace Calamus.TaskScheduler.Infrastructure
             var password = context.JobDetail.JobDataMap.GetPassword();
             var deleteOnCopied = context.JobDetail.JobDataMap.GetDeleteOnCopied();
 
+            var jobName = $"{context.JobDetail.Key.Group}-{context.JobDetail.Key.Name}";
+
             if (transferType == (int)TransferTypeEnum.SharedFolder)
             {
                 using (var st = new SharedTool(userName, password, srcRootPath))
@@ -40,16 +43,16 @@ namespace Calamus.TaskScheduler.Infrastructure
                     {
                         try
                         {
-                            _log.LogInformation($"Start getting source path {srcRootPath} info...");
+                            LogInformation(jobName, $"Start getting source path {srcRootPath} info...");
 
                             GetFiles(srcRootPath, "*.*", ref fileList);
 
-                            _log.LogInformation($"Complete getting source path {srcRootPath} info.");
+                            LogInformation(jobName, $"Complete getting source path {srcRootPath} info.");
                         }
                         catch (Exception ex)
                         {
-                            _log.LogError($"Error while getting source path {srcRootPath} info.");
-                            _log.LogError(ex, ex.Message);
+                            LogError(jobName, $"Error while getting source path {srcRootPath} info.");
+                            LogError(jobName, ex, ex.Message);
                         }
                     });
 
@@ -69,25 +72,25 @@ namespace Calamus.TaskScheduler.Infrastructure
                                     var dir = Path.GetDirectoryName(destFilePath);
                                     Directory.CreateDirectory(dir);
 
-                                    _log.LogInformation($"Start copying {file} to {destFilePath}...");
+                                    LogInformation(jobName, $"Start copying {file} to {destFilePath}...");
 
-                                    File.Copy(file, destFilePath);
+                                    File.Copy(file, destFilePath, true);
 
-                                    _log.LogInformation($"Complete copying {file} to {destFilePath}.");
+                                    LogInformation(jobName, $"Complete copying {file} to {destFilePath}.");
 
                                     if (deleteOnCopied)
                                     {
-                                        _log.LogInformation($"Start deleting {file}...");
+                                        LogInformation(jobName, $"Start deleting {file}...");
 
                                         File.Delete(file);
 
-                                        _log.LogInformation($"Complete deleting {file}.");
+                                        LogInformation(jobName, $"Complete deleting {file}.");
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    _log.LogError($"Error while copying {file} to {destFilePath}.");
-                                    _log.LogError(ex, ex.Message);
+                                    LogError(jobName, $"Error while copying {file} to {destFilePath}.");
+                                    LogError(jobName, ex, ex.Message);
                                 }
                             });
                         }
@@ -135,6 +138,33 @@ namespace Calamus.TaskScheduler.Infrastructure
         {
             if (source.Length <= length) return source;
             return source.Substring(0, length);
+        }
+
+        void LogInformation(string jobName, string message)
+        {
+            _log.Log(Microsoft.Extensions.Logging.LogLevel.Information,
+             default(EventId),
+             new MyLogEvent(message).WithProperty("JobName", jobName),
+             (Exception)null,
+             MyLogEvent.Formatter);
+        }
+
+        void LogError(string jobName, string message)
+        {
+            _log.Log(Microsoft.Extensions.Logging.LogLevel.Error,
+             default(EventId),
+             new MyLogEvent(message).WithProperty("JobName", jobName),
+             (Exception)null,
+             MyLogEvent.Formatter);
+        }
+
+        void LogError(string jobName, Exception ex, string message)
+        {
+            _log.Log(Microsoft.Extensions.Logging.LogLevel.Error,
+             default(EventId),
+             new MyLogEvent(message).WithProperty("JobName", jobName),
+             ex,
+             MyLogEvent.Formatter);
         }
     }
 }

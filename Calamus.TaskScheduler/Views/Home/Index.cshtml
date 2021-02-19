@@ -32,7 +32,7 @@
     <!-- /.card-header -->
     <div class="card-body">
         <form class="form-inline" action="javascript:void(0)" id="form_0">
-            <label class="mb-2 mr-sm-2">所属分组：</label>
+            <label class="mb-2 mr-sm-2">所属机台：</label>
             <select asp-for="Group" asp-items="Model.Properties[PropertiesKeys.Key_1]" class="form-control mb-2 mr-sm-2" onchange="doSearch()"></select>
             <label class="mb-2 mr-sm-2">任务名称：</label>
             <input type="text" class="form-control mb-2 mr-sm-2" asp-for="Name" placeholder="任务名称">
@@ -90,10 +90,10 @@
                         }
                     },
                     {
-                        field: "requestUrl",
-                        title: "请求信息",
+                        field: "jobInfo",
+                        title: "任务信息",
                         template: function (model) {
-                            return model.httpMethodName + " | " + model.requestUrl;
+                            return model.transferTypeName + " | " + model.sourceRootPath;
                         }
                     },
                     {
@@ -259,9 +259,9 @@
                 </td>
             </tr>
             <tr>
-                <td><span>请求参数：</span></td>
+                <td><span>源文件匹配模式：</span></td>
                 <td colspan="3">
-                    #= requestBody ? requestBody:'' #
+                    #= sourceFilePattern ? sourceFilePattern:'' #
                 </td>
             </tr>
         </table>
