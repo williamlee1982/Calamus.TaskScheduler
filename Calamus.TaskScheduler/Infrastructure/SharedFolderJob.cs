@@ -36,65 +36,78 @@ namespace Calamus.TaskScheduler.Infrastructure
 
             if (transferType == (int)TransferTypeEnum.SharedFolder)
             {
-                using (var st = new SharedTool(userName, password, srcRootPath))
+                var credential = new System.Net.NetworkCredential
                 {
-                    var fileList = new List<string>();
-                    await Task.Run(() =>
+                    UserName = userName,
+                    Password = password
+                };
+
+                try
+                {
+                    using (var ns = new NetworkConnection(srcRootPath, credential))
                     {
-                        try
+                        var fileList = new List<string>();
+                        await Task.Run(() =>
                         {
-                            LogInformation(jobName, $"Start getting source path {srcRootPath} info...");
-
-                            GetFiles(srcRootPath, "*.*", ref fileList);
-
-                            LogInformation(jobName, $"Complete getting source path {srcRootPath} info.");
-                        }
-                        catch (Exception ex)
-                        {
-                            LogError(jobName, $"Error while getting source path {srcRootPath} info.");
-                            LogError(jobName, ex, ex.Message);
-                        }
-                    });
-
-                    //^(?<fpath>([a-zA-Z]:\\)([\s\.\-\w]+\\)*)(?<fname>[\w]+.[\w]+)
-                    var regex = new Regex(srcFilePatthern);
-                    foreach (var file in fileList)
-                    {
-                        var matchResult = regex.Match(file);
-                        if (matchResult.Success)
-                        {
-                            await Task.Run(() =>
+                            try
                             {
-                                var destFilePath = $"{destRootPath}\\{regex.Replace(file, destFilePattern)}";
+                                LogInformation(jobName, $"Start getting source path {srcRootPath} info...");
 
-                                try
+                                GetFiles(srcRootPath, "*.*", ref fileList);
+
+                                LogInformation(jobName, $"Complete getting source path {srcRootPath} info.");
+                            }
+                            catch (Exception ex)
+                            {
+                                LogError(jobName, $"Error while getting source path {srcRootPath} info.");
+                                LogError(jobName, ex, ex.Message);
+                            }
+                        });
+
+                        //^(?<fpath>([a-zA-Z]:\\)([\s\.\-\w]+\\)*)(?<fname>[\w]+.[\w]+)
+                        var regex = new Regex(srcFilePatthern);
+                        foreach (var file in fileList)
+                        {
+                            var matchResult = regex.Match(file);
+                            if (matchResult.Success)
+                            {
+                                await Task.Run(() =>
                                 {
-                                    var dir = Path.GetDirectoryName(destFilePath);
-                                    Directory.CreateDirectory(dir);
+                                    var destFilePath = $"{destRootPath}\\{regex.Replace(file, destFilePattern)}";
 
-                                    LogInformation(jobName, $"Start copying {file} to {destFilePath}...");
-
-                                    File.Copy(file, destFilePath, true);
-
-                                    LogInformation(jobName, $"Complete copying {file} to {destFilePath}.");
-
-                                    if (deleteOnCopied)
+                                    try
                                     {
-                                        LogInformation(jobName, $"Start deleting {file}...");
+                                        var dir = Path.GetDirectoryName(destFilePath);
+                                        Directory.CreateDirectory(dir);
 
-                                        File.Delete(file);
+                                        LogInformation(jobName, $"Start copying {file} to {destFilePath}...");
 
-                                        LogInformation(jobName, $"Complete deleting {file}.");
+                                        File.Copy(file, destFilePath, true);
+
+                                        LogInformation(jobName, $"Complete copying {file} to {destFilePath}.");
+
+                                        if (deleteOnCopied)
+                                        {
+                                            LogInformation(jobName, $"Start deleting {file}...");
+
+                                            File.Delete(file);
+
+                                            LogInformation(jobName, $"Complete deleting {file}.");
+                                        }
                                     }
-                                }
-                                catch (Exception ex)
-                                {
-                                    LogError(jobName, $"Error while copying {file} to {destFilePath}.");
-                                    LogError(jobName, ex, ex.Message);
-                                }
-                            });
+                                    catch (Exception ex)
+                                    {
+                                        LogError(jobName, $"Error while copying {file} to {destFilePath}.");
+                                        LogError(jobName, ex, ex.Message);
+                                    }
+                                });
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    LogError(jobName, ex, ex.Message);
                 }
             }
 

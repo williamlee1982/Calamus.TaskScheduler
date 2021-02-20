@@ -131,7 +131,7 @@ namespace Calamus.TaskScheduler.Controllers
             {
                 Group = group,
                 TransferType = (int)TransferTypeEnum.SharedFolder,
-                UserName = @".\administrator",
+                UserName = @"administrator",
                 Password = "12345@163.com",
                 SourceRootPath = @"\\10.48.68.205",
                 SourceFilePattern = @"^(?<fpath>(\\\\)([\s\.\-\w]+\\)*)(?<fname>[\w]+.[\w]+)",
@@ -459,14 +459,14 @@ namespace Calamus.TaskScheduler.Controllers
         [HttpGet]
         public async Task<IActionResult> RegEx()
         {
-            var model = new RegExRequest();
+            var model = new RegExModel();
 
             return View(model);
         }
 
         [HttpPost]
         [ModelValidatorFilter]
-        public async Task<RegExRequest> RegEx(RegExRequest request)
+        public async Task<RegExModel> RegEx(RegExModel request)
         {
             await Task.Run(() =>
             {

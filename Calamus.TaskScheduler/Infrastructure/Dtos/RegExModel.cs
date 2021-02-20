@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Calamus.TaskScheduler.Infrastructure.Dtos
 {
-    public class RegExRequest
+    public class RegExModel
     {
         public string RegEx { get; set; }
         public string InputString { get; set; }
@@ -15,7 +15,7 @@ namespace Calamus.TaskScheduler.Infrastructure.Dtos
         public string Result { get; set; }
     }
 
-    public class RegExRequestValidator : AbstractValidator<RegExRequest>
+    public class RegExRequestValidator : AbstractValidator<RegExModel>
     {
         public RegExRequestValidator()
         {
