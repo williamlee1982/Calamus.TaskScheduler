@@ -148,7 +148,7 @@
                 title: "新增任务",
                 type: 2,
                 area: ['60%', '70%'],
-                shadeClose: true, //点击遮罩关闭
+                shadeClose: false, //点击遮罩关闭
                 skin: 'layui-layer-rim', //加上边框
                 content: '@Url.Action("CreateOrUpdate", "Home")?group=' + $("#@Html.IdFor(model=> model.Group)").val(),
                 end: function () {
@@ -161,7 +161,7 @@
                 title: "编辑任务",
                 type: 2,
                 area: ['60%', '70%'],
-                shadeClose: true, //点击遮罩关闭
+                shadeClose: false, //点击遮罩关闭
                 skin: 'layui-layer-rim', //加上边框
                 content: `@Url.Action("CreateOrUpdate", "Home")?group=${group}&name=${name}`,
                 end: function () {
@@ -253,15 +253,15 @@
                 </td>
             </tr>
             <tr>
-                <td><span>描述信息：</span></td>
-                <td colspan="3">
-                    #= description ? description:'' #
-                </td>
-            </tr>
-            <tr>
                 <td><span>源文件匹配模式：</span></td>
                 <td colspan="3">
                     #= sourceFilePattern ? sourceFilePattern:'' #
+                </td>
+            </tr>
+            <tr>
+                <td><span>描述信息：</span></td>
+                <td colspan="3">
+                    #= description ? description:'' #
                 </td>
             </tr>
         </table>
