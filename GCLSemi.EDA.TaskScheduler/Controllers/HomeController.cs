@@ -1,6 +1,7 @@
 ﻿using Calamus.TaskScheduler.Infrastructure;
 using Calamus.TaskScheduler.Infrastructure.Dtos;
 using Calamus.TaskScheduler.Infrastructure.Filters;
+using CronExpressionDescriptor;
 using FluentEmail.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -75,10 +76,10 @@ namespace Calamus.TaskScheduler.Controllers
                 // 过滤掉邮件通知配置job，NLog日志文件清除Job
                 if (string.Equals(key.Name, EmailJobKeys.NameKey, StringComparison.InvariantCultureIgnoreCase) || string.Equals(key.Name, NLogJobKey.NameKey, StringComparison.InvariantCultureIgnoreCase)) continue;
 
-                IJobDetail job = await _scheduler.GetJobDetail(key);
+                var job = await _scheduler.GetJobDetail(key);
                 if (job == null) continue;
 
-                JobResponse item = new JobResponse
+                var item = new JobResponse
                 {
                     Name = job.Key.Name,
                     Group = job.Key.Group,
@@ -98,8 +99,8 @@ namespace Calamus.TaskScheduler.Controllers
                     LastException = job.JobDataMap.GetLastException()
                 };
 
-                IReadOnlyCollection<ITrigger> triggers = await _scheduler.GetTriggersOfJob(key);
-                ITrigger trigger = triggers.FirstOrDefault();   // 获取当前job关联的第一个 trigger
+                var triggers = await _scheduler.GetTriggersOfJob(key);
+                var trigger = triggers.FirstOrDefault();   // 获取当前job关联的第一个 trigger
                 if (trigger != null)
                 {
                     TriggerState triggerState = await _scheduler.GetTriggerState(trigger.Key);  // trigger 状态
@@ -113,7 +114,7 @@ namespace Calamus.TaskScheduler.Controllers
                         span = (nextFire.Value - prevFire.Value);
                     }
                     item.TriggerState = triggerState;
-                    item.FirePlan = $"{span.Days}天{span.Hours}小时{span.Minutes}分{span.Seconds}秒";    // 执行频率
+                    item.FirePlan = item.TriggerType == (int)TriggerTypeEnum.Simple ? $"{span.Days}天{span.Hours}小时{span.Minutes}分{span.Seconds}秒" : item.CronDesc;   // 执行频率
                     item.PrevFireTime = prevFire;
                     item.NextFireTime = nextFire;
                 };
