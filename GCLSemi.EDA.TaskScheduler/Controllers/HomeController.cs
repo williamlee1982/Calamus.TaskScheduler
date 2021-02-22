@@ -169,7 +169,6 @@ namespace Calamus.TaskScheduler.Controllers
                     IntervalType = job.JobDataMap.GetIntervalType(),
                     RepeatCount = job.JobDataMap.GetRepeatCount(),
                     Cron = job.JobDataMap.GetCron(),
-                    RequestBody = job.JobDataMap.GetRequestBody(),
                     Description = job.Description,
                     IsUpdate = true
                 };
@@ -214,7 +213,6 @@ namespace Calamus.TaskScheduler.Controllers
             dataMap.Put(DataKeys.Interval, request.Interval);
             dataMap.Put(DataKeys.IntervalType, request.IntervalType);
             dataMap.Put(DataKeys.Cron, request.Cron);
-            dataMap.Put(DataKeys.RequestBody, request.RequestBody);
             dataMap.Put(DataKeys.CreateTime, DateTime.Now.ToString());
             dataMap.Put(DataKeys.StartTime, request.StartTime.ToString());
             dataMap.Put(DataKeys.EndTime, request.EndTime.HasValue ? request.EndTime.Value.ToString() : string.Empty);

@@ -75,10 +75,6 @@ namespace Calamus.TaskScheduler.Infrastructure.Dtos
         /// </summary>
         public DateTime? EndTime { get; set; }
         /// <summary>
-        /// 请求参数
-        /// </summary>
-        public string RequestBody { get; set; }
-        /// <summary>
         /// 描述信息
         /// </summary>
         public string Description { get; set; }
